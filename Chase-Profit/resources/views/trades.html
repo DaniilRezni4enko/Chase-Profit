@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chase-Profit - ваш лучший выбор для трейдинга</title>
+  <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+  <style>
+    /* Все предыдущие стили остаются без изменений */
+    /* Добавляем новые стили для сделок и уведомлений */
+
+    /* Секция сделок */
+    .trades-section {
+      padding: 60px 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .trades-section.active {
+      display: block;
+    }
+
+    .trades-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .trades-tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      border-bottom: 2px solid transparent;
+    }
+
+    .trades-tab.active {
+      color: var(--accent-color);
+      border-bottom-color: var(--accent-color);
+    }
+
+    .trades-table {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .trades-table .table-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      padding: 20px;
+      background: var(--secondary-bg);
+      border-bottom: 1px solid var(--border-color);
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .trades-table .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      transition: background 0.3s;
+    }
+
+    .trades-table .table-row:hover {
+      background: var(--secondary-bg);
+    }
+
+    .order-type-buy {
+      color: var(--positive);
+      font-weight: 600;
+    }
+
+    .order-type-sell {
+      color: var(--negative);
+      font-weight: 600;
+    }
+
+    .order-status {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-completed {
+      background: var(--positive);
+      color: white;
+    }
+
+    .status-active {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    .status-cancelled {
+      background: var(--text-secondary);
+      color: white;
+    }
+
+    /* Уведомления */
+    .notifications-section {
+      padding: 60px 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      display: none;
+    }
+
+    .notifications-section.active {
+      display: block;
+    }
+
+    .notification-bell {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: var(--accent-color);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 192, 135, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .notification-bell:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 25px rgba(0, 192, 135, 0.4);
+    }
+
+    .notification-bell i {
+      color: white;
+      font-size: 24px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--negative);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .notification-item {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .notification-item:hover {
+      transform: translateX(5px);
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .notification-item.unread {
+      border-left: 4px solid var(--accent-color);
+      background: var(--secondary-bg);
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .notification-title {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .notification-time {
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+    }
+
+    .notification-message {
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Всплывающие уведомления */
+    .notification-toast {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 15px;
+      max-width: 300px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      z-index: 1001;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+
+    .notification-toast.show {
+      transform: translateX(0);
+    }
+
+    .notification-toast .notification-header {
+      margin-bottom: 5px;
+    }
+
+    .notification-toast .notification-message {
+      font-size: 0.9rem;
+    }
+
+    /* Адаптивность для новых таблиц */
+    @media (max-width: 768px) {
+      .trades-table .table-header,
+      .trades-table .table-row {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .trades-table .table-header :nth-child(4),
+      .trades-table .table-header :nth-child(5),
+      .trades-table .table-header :nth-child(6),
+      .trades-table .table-row :nth-child(4),
+      .trades-table .table-row :nth-child(5),
+      .trades-table .table-row :nth-child(6) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+  <div class="nav-container">
+    <div class="logo">
+      <span>⚡</span>
+      ChaseProfit
+    </div>
+    <nav class="nav-menu">
+      <a href="#" class="nav-item" data-section="trading">Trade</a>
+      <a href="#" class="nav-item" data-section="trades">Trades</a>
+      <a href="/vallets" class="nav-item">Currency</a>
+      <a href="/about_us" class="nav-item">About Us</a>
+      <a href="/analyze_settings" class="nav-item">Analyze Settings</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="theme-toggle" id="themeToggle">🌙</button>
+      <button class="btn btn-login"><a href="/auth">Log In</a></button>
+      <button class="btn btn-register"><a href="/register">Register</a></button>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <!-- Hero Section (остается без изменений) -->
+  <section class="hero active" id="hero-section">
+    <!-- ... существующий контент hero ... -->
+  </section>
+
+  <!-- Trading Section (остается без изменений) -->
+  <section class="trading-section" id="trading-section">
+    <!-- ... существующий контент trading ... -->
+  </section>
+
+  <!-- Новая секция сделок -->
+  <section class="trades-section" id="trades-section">
+    <div class="section-header">
+      <h2 class="section-title">My Trades</h2>
+    </div>
+
+    <div class="trades-tabs">
+      <div class="trades-tab active" data-tab="active">Active Orders</div>
+      <div class="trades-tab" data-tab="history">Trade History</div>
+    </div>
+
+    <div class="trades-table">
+      <div class="table-header">
+        <div>Pair</div>
+        <div>Type</div>
+        <div>Price</div>
+        <div>Amount</div>
+        <div>Total</div>
+        <div>Status</div>
+      </div>
+      <div id="active-trades-body">
+        <!-- Активные сделки будут здесь -->
+      </div>
+      <div id="history-trades-body" style="display: none;">
+        <!-- История сделок будет здесь -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Новая секция уведомлений -->
+  <section class="notifications-section" id="notifications-section">
+    <div class="section-header">
+      <h2 class="section-title">Notifications</h2>
+      <button class="btn btn-login" id="markAllRead">Mark All as Read</button>
+    </div>
+
+    <div id="notifications-list">
+      <!-- Уведомления будут здесь -->
+    </div>
+  </section>
+
+  <!-- Остальные существующие секции -->
+  <!-- Market Section, Features Section, Footer -->
+</main>
+
+<!-- Колокольчик уведомлений -->
+<div class="notification-bell" id="notificationBell">
+  <i>🔔</i>
+  <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
+</div>
+
+<!-- Всплывающее уведомление -->
+<div class="notification-toast" id="notificationToast">
+  <div class="notification-header">
+    <div class="notification-title" id="toastTitle">Notification</div>
+    <div class="notification-time" id="toastTime">Just now</div>
+  </div>
+  <div class="notification-message" id="toastMessage">This is a notification message</div>
+</div>
+
+<script>
+  // Данные сделок (в реальном приложении будут приходить с сервера)
+  const tradesData = {
+    active: [
+      { id: 1, pair: 'BTC/USDT', type: 'buy', price: 45230.50, amount: 0.1, total: 4523.05, status: 'active', timestamp: Date.now() - 3600000 },
+      { id: 2, pair: 'ETH/USDT', type: 'sell', price: 2450.75, amount: 2.5, total: 6126.88, status: 'active', timestamp: Date.now() - 7200000 }
+    ],
+    history: [
+      { id: 3, pair: 'BTC/USDT', type: 'buy', price: 44800.00, amount: 0.05, total: 2240.00, status: 'completed', timestamp: Date.now() - 86400000 },
+      { id: 4, pair: 'ETH/USDT', type: 'sell', price: 2400.00, amount: 1.0, total: 2400.00, status: 'completed', timestamp: Date.now() - 172800000 },
+      { id: 5, pair: 'SOL/USDT', type: 'buy', price: 98.50, amount: 10, total: 985.00, status: 'cancelled', timestamp: Date.now() - 259200000 }
+    ]
+  };
+
+  // Данные уведомлений
+  let notifications = [
+    { id: 1, title: 'Order Filled', message: 'Your BTC buy order at $45,230.50 has been filled', timestamp: Date.now() - 300000, read: false, type: 'trade' },
+    { id: 2, title: 'Price Alert', message: 'BTC reached $45,000. Target price achieved', timestamp: Date.now() - 1800000, read: false, type: 'alert' },
+    { id: 3, title: 'Welcome Bonus', message: 'Claim your $10 welcome bonus for your first deposit', timestamp: Date.now() - 3600000, read: true, type: 'promo' }
+  ];
+
+  // Навигация между секциями
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+      e.preventDefault();
+
+      // Убираем активный класс у всех пунктов меню
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      this.classList.add('active');
+
+      const section = this.dataset.section;
+      if (section) {
+        // Скрываем все секции
+        document.querySelectorAll('.hero, .trading-section, .trades-section, .notifications-section').forEach(sec => {
+          sec.classList.remove('active');
+        });
+
+        // Показываем выбранную секцию
+        document.getElementById(section + '-section').classList.add('active');
+      }
+    });
+  });
+
+  // Инициализация секции сделок
+  function initializeTradesSection() {
+    populateTradesTable('active', tradesData.active);
+    populateTradesTable('history', tradesData.history);
+
+    // Переключение между активными и историческими сделками
+    document.querySelectorAll('.trades-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.trades-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        const tabType = this.dataset.tab;
+        document.getElementById('active-trades-body').style.display = tabType === 'active' ? 'block' : 'none';
+        document.getElementById('history-trades-body').style.display = tabType === 'history' ? 'block' : 'none';
+      });
+    });
+  }
+
+  function populateTradesTable(type, data) {
+    const tableBody = document.getElementById(`${type}-trades-body`);
+    tableBody.innerHTML = '';
+
+    data.forEach(trade => {
+      const row = document.createElement('div');
+      row.className = 'table-row';
+
+      const typeClass = trade.type === 'buy' ? 'order-type-buy' : 'order-type-sell';
+      const statusClass = `status-${trade.status}`;
+
+      row.innerHTML = `
+                <div class="coin-info">
+                    <div class="coin-name">${trade.pair}</div>
+                </div>
+                <div class="${typeClass}">${trade.type.toUpperCase()}</div>
+                <div>$${trade.price.toLocaleString()}</div>
+                <div>${trade.amount}</div>
+                <div>$${trade.total.toLocaleString()}</div>
+                <div><span class="order-status ${statusClass}">${trade.status}</span></div>
+            `;
+
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Система уведомлений
+  function initializeNotifications() {
+    updateNotificationBadge();
+    populateNotificationsList();
+
+    // Колокольчик - переход к уведомлениям
+    document.getElementById('notificationBell').addEventListener('click', function() {
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      document.querySelectorAll('.hero, .trading-section, .trades-section, .notifications-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      document.getElementById('notifications-section').classList.add('active');
+    });
+
+    // Отметить все как прочитанные
+    document.getElementById('markAllRead').addEventListener('click', function() {
+      notifications.forEach(notification => notification.read = true);
+      updateNotificationBadge();
+      populateNotificationsList();
+    });
+  }
+
+  function updateNotificationBadge() {
+    const unreadCount = notifications.filter(n => !n.read).length;
+    const badge = document.getElementById('notificationBadge');
+
+    if (unreadCount > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  function populateNotificationsList() {
+    const list = document.getElementById('notifications-list');
+    list.innerHTML = '';
+
+    // Сортируем по времени (новые сверху)
+    const sortedNotifications = [...notifications].sort((a, b) => b.timestamp - a.timestamp);
+
+    sortedNotifications.forEach(notification => {
+      const item = document.createElement('div');
+      item.className = `notification-item ${notification.read ? '' : 'unread'}`;
+      item.addEventListener('click', () => markNotificationAsRead(notification.id));
+
+      const timeAgo = getTimeAgo(notification.timestamp);
+
+      item.innerHTML = `
+                <div class="notification-header">
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-time">${timeAgo}</div>
+                </div>
+                <div class="notification-message">${notification.message}</div>
+            `;
+
+      list.appendChild(item);
+    });
+  }
+
+  function markNotificationAsRead(id) {
+    const notification = notifications.find(n => n.id === id);
+    if (notification && !notification.read) {
+      notification.read = true;
+      updateNotificationBadge();
+      populateNotificationsList();
+    }
+  }
+
+  function showToastNotification(title, message) {
+    const toast = document.getElementById('notificationToast');
+    document.getElementById('toastTitle').textContent = title;
+    document.getElementById('toastMessage').textContent = message;
+    document.getElementById('toastTime').textContent = 'Just now';
+
+    toast.classList.add('show');
+
+    // Автоматическое скрытие через 5 секунд
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 5000);
+
+    // При клике на тост переходим к уведомлениям
+    toast.addEventListener('click', function() {
+      document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+      document.querySelectorAll('.hero, .trading-section, .trades-section, .notifications-section').forEach(sec => {
+        sec.classList.remove('active');
+      });
+      document.getElementById('notifications-section').classList.add('active');
+      toast.classList.remove('show');
+    });
+
+    // Добавляем уведомление в список
+    const newNotification = {
+      id: notifications.length + 1,
+      title: title,
+      message: message,
+      timestamp: Date.now(),
+      read: false,
+      type: 'info'
+    };
+
+    notifications.unshift(newNotification);
+    updateNotificationBadge();
+  }
+
+  function getTimeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  }
+
+  // Симуляция новых уведомлений для демонстрации
+  function simulateNotifications() {
+    setTimeout(() => {
+      showToastNotification('Market Update', 'BTC has increased by 2.5% in the last hour');
+    }, 10000);
+
+    setTimeout(() => {
+      showToastNotification('New Feature', 'Margin trading is now available on ChaseProfit');
+    }, 20000);
+  }
+
+  // Инициализация при загрузке
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeChart();
+    populateMarketTable();
+    calculateTotal();
+    updateOrderPanelSymbol();
+    updateChartData();
+
+    // Инициализируем новые функции
+    initializeTradesSection();
+    initializeNotifications();
+    simulateNotifications(); // Для демонстрации
+  });
+
+  // Остальной существующий JavaScript код остается без изменений
+</script>
+</body>
+</html>

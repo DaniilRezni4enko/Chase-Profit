@@ -1,0 +1,60 @@
+{
+  "alerts": [
+    {
+      "id": 1047,
+      "userId": "daaaa@yandex.ru",
+      "title": "Новое уведомление!",
+      "message": "📈 БЫЧИЙ | BTC | Вероятность: 84 | ЦЕНА: 89650.7 | TP: 89738 | SL: 89516",
+      "type": "alerts",
+      "silent": false
+    },
+    {
+      "id": 1048,
+      "userId": "daaaa@yandex.ru",
+      "title": "Новое уведомление!!",
+      "message": "📈 БЫЧИЙ | ETH | Вероятность: 91 | ЦЕНА: 3114.87 | TP: 3113.326845 | SL: 3113.240546",
+      "type": "alerts",
+      "silent": false
+    },
+    {
+      "id": 1049,
+      "userId": "daaaa@yandex.ru",
+      "title": "Новое уведомление!",
+      "message": "📈 БЫЧИЙ | BTC | Вероятность: 82 | ЦЕНА: 90207.5 | TP: 90305.689153 | SL: 90148.141147",
+      "type": "alerts",
+      "silent": false
+    },
+    {
+      "id": 1050,
+      "userId": "daaaa@yandex.ru",
+      "title": "New Alerts!",
+      "message": "📈 БЫЧИЙ |  | Вероятность: 0 | ЦЕНА: 0 | TP: 0 | SL: 0",
+      "type": "alerts",
+      "silent": false
+    },
+    {
+      "id": 1051,
+      "userId": "daaaa@yandex.ru",
+      "title": "New Alerts!",
+      "message": "📈 БЫЧИЙ |  | Вероятность: 0 | ЦЕНА: 0 | TP: 0 | SL: 0",
+      "type": "alerts",
+      "silent": false
+    },
+    {
+      "id": 1052,
+      "userId": "daaaa@yandex.ru",
+      "title": "New Alerts!",
+      "message": "📈 БЫЧИЙ |  | Вероятность: 0 | ЦЕНА: 0 | TP: 0 | SL: 0",
+      "type": "alerts",
+      "silent": false
+    },
+    {
+      "id": 1053,
+      "userId": "daaaa@yandex.ru",
+      "title": "New Alerts!",
+      "message": "📈 БЫЧИЙ |  | Вероятность: 0 | ЦЕНА: 0 | TP: 0 | SL: 0",
+      "type": "alerts",
+      "silent": false
+    }
+  ]
+}
