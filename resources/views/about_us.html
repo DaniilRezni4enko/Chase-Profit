@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaseProfit - About Us</title>
+    <style>
+        /* Все стили из примера остаются без изменений */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0e0e0e;
+            --secondary-bg: #1a1a1a;
+            --accent-color: #00c087;
+            --accent-hover: #00a871;
+            --text-primary: #ffffff;
+            --text-secondary: #848e9c;
+            --border-color: #2a2a2a;
+            --positive: #00c087;
+            --negative: #f6465d;
+            --card-bg: #151515;
+            --chart-bg: #121212;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f8f9fa;
+            --accent-color: #00c087;
+            --accent-hover: #00a871;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --positive: #00c087;
+            --negative: #f6465d;
+            --card-bg: #ffffff;
+            --chart-bg: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-register {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-register:hover {
+            background: var(--accent-hover);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 64px;
+            min-height: calc(100vh - 64px);
+        }
+
+        /* Hero Section for About Us */
+        .about-hero {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            padding: 100px 20px;
+            text-align: center;
+        }
+
+        .about-hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .about-hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--accent-color), #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* About Content Sections */
+        .about-section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 40px 0 20px;
+            color: var(--accent-color);
+        }
+
+        .about-content {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 50px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 40px;
+        }
+
+        .about-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .about-text strong {
+            color: var(--text-primary);
+        }
+
+        .mission-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .mission-card {
+            background: var(--secondary-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .mission-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .mission-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .mission-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Disclaimer Section */
+        .disclaimer-section {
+            background: var(--secondary-bg);
+            padding: 50px 20px;
+            margin-top: 60px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .disclaimer-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--negative);
+            font-weight: 600;
+        }
+
+        .disclaimer-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* Features Section - аналогично примеру */
+        .features {
+            padding: 80px 20px;
+            background: var(--secondary-bg);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--secondary-bg);
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .about-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .about-content {
+                padding: 30px 20px;
+            }
+
+            .mission-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="nav-container">
+        <div class="logo">
+            <span>⚡</span>
+            ChaseProfit
+        </div>
+        <nav class="nav-menu">
+            <a href="/user_alerts" class="nav-item">Alerts</a>
+            <a href="/vallets" class="nav-item">Currency</a>
+            <a href="/about_us" class="nav-item active">About Us</a>
+            <a href="/analyze_settings" class="nav-item">Analyze Settings</a>
+        </nav>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <button class="btn btn-login"><a href="/auth">Log In</a></button>
+            <button class="btn btn-register"><a href="/register">Register</a></button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Hero Section for About Us -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <h1>About ChaseProfit</h1>
+            <p>Your advanced cryptocurrency trading assistant designed for maximum efficiency and confidence</p>
+        </div>
+    </section>
+
+    <!-- About Content -->
+    <section class="about-section">
+        <div class="about-content">
+            <h2 class="section-title">Our Mission</h2>
+
+            <p class="about-text">
+                <strong>ChaseProfit</strong> is an innovative cryptocurrency trading assistant with a wide range of capabilities,
+                created for those who strive for maximally efficient and confident work in the market.
+            </p>
+
+            <p class="about-text">
+                With it, you gain access to fast, accurate, and in-depth analysis of cryptocurrency pairs.
+                We offer one of the most advanced analytics formats, based on price dynamics and key market indices,
+                so you can make decisions with maximum confidence.
+            </p>
+
+            <h3 class="section-subtitle">Introduction to Cryptocurrencies</h3>
+
+            <p class="about-text">
+                Cryptocurrencies are digital assets protected by cryptography and existing exclusively in virtual space,
+                unlike familiar fiat currencies like the US dollar. The most well-known cryptocurrencies -
+                <strong>Bitcoin (BTC)</strong>, <strong>Ethereum (ETH)</strong>, and <strong>Solana (SOL)</strong> -
+                operate on blockchain technology, which is a decentralized digital ledger.
+            </p>
+
+            <p class="about-text">
+                Each transaction is permanently recorded in the blockchain after verification and confirmation.
+                Unlike traditional currencies, control over which is concentrated in the hands of banks and financial regulators,
+                cryptocurrency transactions are processed by a decentralized network of participants.
+            </p>
+
+            <p class="about-text">
+                Depending on the consensus mechanism, any user can participate in confirming transactions and adding them to the blockchain.
+                It is this open architecture that makes cryptocurrencies truly decentralized. Many experts believe that blockchain can
+                radically change the global financial system - and the growth of corporate investments from major companies,
+                including Samsung, BlackRock, Morgan Stanley, and Alphabet, only strengthens this trend.
+            </p>
+
+            <p class="about-text">
+                Trading cryptocurrencies provides access to the world of decentralized finance and allows you to touch modern
+                technological solutions.
+            </p>
+
+            <div class="mission-section">
+                <div class="mission-card">
+                    <div class="mission-icon">⚡</div>
+                    <h4 class="mission-title">Fast & Accurate Analysis</h4>
+                    <p class="mission-desc">Real-time market analysis with advanced algorithms and deep learning technology.</p>
+                </div>
+
+                <div class="mission-card">
+                    <div class="mission-icon">🔒</div>
+                    <h4 class="mission-title">Secure Platform</h4>
+                    <p class="mission-desc">Enterprise-grade security to protect your data and trading activities.</p>
+                </div>
+
+                <div class="mission-card">
+                    <div class="mission-icon">📈</div>
+                    <h4 class="mission-title">Advanced Tools</h4>
+                    <p class="mission-desc">Professional trading tools and indicators for informed decision making.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer Section -->
+        <div class="disclaimer-section">
+            <h3 class="disclaimer-title">Important Disclaimer</h3>
+            <p class="disclaimer-text">
+                The ChaseProfit team is not responsible for any financial losses, damages, or other consequences
+                related to the use of the provided analytics, tools, or recommendations. All information is for
+                informational and analytical purposes only and is not financial advice. The user independently makes
+                trading decisions and is fully responsible for the results of their actions in the cryptocurrency market.
+            </p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">Why Choose ChaseProfit</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🚀</div>
+                <h3 class="feature-title">Advanced Analytics</h3>
+                <p class="feature-desc">Deep market analysis with real-time data processing and predictive algorithms.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Precision Tools</h3>
+                <p class="feature-desc">Professional trading instruments for accurate market entry and exit points.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Real-time Updates</h3>
+                <p class="feature-desc">Continuous market monitoring and instant notifications for trading opportunities.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Market Insights</h3>
+                <p class="feature-desc">Comprehensive market data and trend analysis for informed decision making.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-column">
+            <h3>Products</h3>
+            <ul class="footer-links">
+                <li><a href="/">Spot Trading</a></li>
+                <li><a href="/">Futures</a></li>
+                <li><a href="/">Options</a></li>
+                <li><a href="/">Earn</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>Company</h3>
+            <ul class="footer-links">
+                <li><a href="/about_us">About Us</a></li>
+                <li><a href="/">Careers</a></li>
+                <li><a href="/">Blog</a></li>
+                <li><a href="/">Security</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>Support</h3>
+            <ul class="footer-links">
+                <li><a href="/">Help Center</a></li>
+                <li><a href="/">Contact Us</a></li>
+                <li><a href="/">API Documentation</a></li>
+                <li><a href="/">Trading Rules</a></li>
+            </ul>
+        </div>
+        <div class="footer-column">
+            <h3>Resources</h3>
+            <ul class="footer-links">
+                <li><a href="/">Market Data</a></li>
+                <li><a href="/">Trading Guides</a></li>
+                <li><a href="/">Community</a></li>
+                <li><a href="/">News & Updates</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="copyright">
+        © 2024 ChaseProfit. All rights reserved.
+    </div>
+</footer>
+
+<script>
+    // Theme Toggle Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeButton(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        });
+    });
+
+    function updateThemeButton(theme) {
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    }
+
+    // Simple cookie check for auth buttons (optional)
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+    function updateAuthButtons() {
+        const userCookie = getCookie('user');
+        if (userCookie) {
+            const loginBtn = document.querySelector('.btn-login');
+            const registerBtn = document.querySelector('.btn-register');
+            if (loginBtn && registerBtn) {
+                loginBtn.innerHTML = '<a href="/profile">Profile</a>';
+                registerBtn.textContent = 'Log Out';
+                registerBtn.onclick = function() {
+                    document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    location.reload();
+                };
+            }
+        }
+    }
+
+    // Initialize on load
+    updateAuthButtons();
+</script>
+</body>
+</html>

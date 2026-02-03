@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaseProfit - Мои уведомления</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0e0e0e;
+            --secondary-bg: #1a1a1a;
+            --accent-color: #00c087;
+            --accent-hover: #00a871;
+            --text-primary: #ffffff;
+            --text-secondary: #848e9c;
+            --border-color: #2a2a2a;
+            --positive: #00c087;
+            --negative: #f6465d;
+            --card-bg: #151515;
+            --chart-bg: #121212;
+            --alert-info: #3498db;
+            --alert-warning: #f39c12;
+            --alert-success: #2ecc71;
+            --alert-error: #e74c3c;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f8f9fa;
+            --accent-color: #00c087;
+            --accent-hover: #00a871;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --positive: #00c087;
+            --negative: #f6465d;
+            --card-bg: #ffffff;
+            --chart-bg: #f8f9fa;
+            --alert-info: #3498db;
+            --alert-warning: #f39c12;
+            --alert-success: #2ecc71;
+            --alert-error: #e74c3c;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-register {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-register:hover {
+            background: var(--accent-hover);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+        .main-content {
+            margin-top: 64px;
+            min-height: calc(100vh - 64px);
+            padding: 20px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+
+        .alerts-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            min-width: 250px;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        .alerts-container {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .alert-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-color);
+        }
+
+        .alert-card.unread {
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .alert-card.silent {
+            opacity: 0.7;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .alert-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .alert-type.alerts {
+            background: var(--alert-info);
+        }
+
+        .alert-type.warning {
+            background: var(--alert-warning);
+        }
+
+        .alert-type.success {
+            background: var(--alert-success);
+        }
+
+        .alert-type.error {
+            background: var(--alert-error);
+        }
+
+        .alert-meta {
+            display: flex;
+            gap: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .alert-id {
+            font-family: monospace;
+            background: var(--secondary-bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .alert-message {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 20px 0;
+            padding: 20px;
+            background: var(--secondary-bg);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .alert-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-mark-read {
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-delete {
+            background: var(--negative);
+            color: white;
+        }
+
+        .alert-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .empty-state-message {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--negative);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            color: var(--text-secondary);
+            gap: 10px;
+        }
+
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .alerts-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .alert-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .alert-footer {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .alert-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="nav-container">
+        <div class="logo">
+            <span>⚡</span>
+            ChaseProfit
+        </div>
+        <nav class="nav-menu">
+            <a href="/user_alerts" class="nav-item active">Уведомления</a>
+            <a href="/vallets" class="nav-item">Валюты</a>
+            <a href="/about_us" class="nav-item">О нас</a>
+            <a href="/analyze_settings" class="nav-item">Настройки анализа</a>
+        </nav>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <button class="btn btn-login"><a href="/auth" style="color: inherit; text-decoration: none;">Войти</a></button>
+            <button class="btn btn-register"><a href="/register" style="color: inherit; text-decoration: none;">Зарегистрироваться</a></button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Мои уведомления</h1>
+            <p class="page-subtitle">Торговые сигналы и оповещения в реальном времени</p>
+        </div>
+        <div class="alerts-controls">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск уведомлений...">
+            <select class="filter-select" id="filterSelect">
+                <option value="all">Все уведомления</option>
+                <option value="unread">Непрочитанные</option>
+                <option value="alerts">Торговые сигналы</option>
+            </select>
+            <button class="btn btn-register" id="markAllReadBtn">Отметить все как прочитанные</button>
+        </div>
+    </div>
+
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-value" id="totalAlerts">0</div>
+            <div class="stat-label">Всего уведомлений</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="unreadAlerts">0</div>
+            <div class="stat-label">Непрочитанных</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="todayAlerts">0</div>
+            <div class="stat-label">Сегодня</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="tradeSignals">0</div>
+            <div class="stat-label">Торговых сигналов</div>
+        </div>
+    </div>
+
+    <div class="alerts-container" id="alertsContainer">
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <span>Загрузка уведомлений...</span>
+        </div>
+    </div>
+</main>
+
+<script>
+    // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+    let alertsData = [];
+    let filteredAlerts = [];
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing alerts page...');
+        initializeTheme();
+        loadAlertsData();
+        setupEventListeners();
+    });
+
+    // ========== ЗАГРУЗКА ДАННЫХ ==========
+    async function loadAlertsData() {
+        try {
+            // В реальном приложении здесь будет fetch запрос к API
+            // Для демонстрации используем предоставленные данные
+            const sampleData = {
+                "alerts": [
+                    {
+                        "id": 1047,
+                        "userId": "daaaa@yandex.ru",
+                        "title": "Новое уведомление!",
+                        "message": "📈 БЫЧИЙ | BTC | Вероятность: 84 | ЦЕНА: 89650.7 | TP: 89738 | SL: 89516",
+                        "type": "alerts",
+                        "silent": false,
+                        "read": false,
+                        "timestamp": new Date(Date.now() - 3600000).toISOString() // 1 час назад
+                    },
+                    {
+                        "id": 1048,
+                        "userId": "daaaa@yandex.ru",
+                        "title": "Новое уведомление!!",
+                        "message": "📈 БЫЧИЙ | ETH | Вероятность: 91 | ЦЕНА: 3114.87 | TP: 3113.326845 | SL: 3113.240546",
+                        "type": "alerts",
+                        "silent": false,
+                        "read": false,
+                        "timestamp": new Date(Date.now() - 7200000).toISOString() // 2 часа назад
+                    },
+                    {
+                        "id": 1049,
+                        "userId": "daaaa@yandex.ru",
+                        "title": "Новое уведомление!",
+                        "message": "📈 БЫЧИЙ | BTC | Вероятность: 82 | ЦЕНА: 90207.5 | TP: 90305.689153 | SL: 90148.141147",
+                        "type": "alerts",
+                        "silent": false,
+                        "read": true,
+                        "timestamp": new Date(Date.now() - 86400000).toISOString() // 1 день назад
+                    }
+                ]
+            };
+
+            // Добавляем дополнительные уведомления для демонстрации
+            for (let i = 1050; i <= 1060; i++) {
+                const types = ['alerts', 'warning', 'success', 'error'];
+                const coins = ['BTC', 'ETH', 'SOL', 'ADA', 'XRP', 'BNB', 'DOGE'];
+                const trend = Math.random() > 0.5 ? '📈 БЫЧИЙ' : '📉 МЕДВЕЖИЙ';
+                const coin = coins[Math.floor(Math.random() * coins.length)];
+                const probability = Math.floor(Math.random() * 30) + 70;
+                const price = (Math.random() * 100000).toFixed(2);
+                const tp = (parseFloat(price) * (1 + Math.random() * 0.05)).toFixed(6);
+                const sl = (parseFloat(price) * (1 - Math.random() * 0.03)).toFixed(6);
+
+                sampleData.alerts.push({
+                    "id": i,
+                    "userId": "daaaa@yandex.ru",
+                    "title": `Торговый сигнал ${i-1049}`,
+                    "message": `${trend} | ${coin} | Вероятность: ${probability} | ЦЕНА: ${price} | TP: ${tp} | SL: ${sl}`,
+                    "type": types[Math.floor(Math.random() * types.length)],
+                    "silent": Math.random() > 0.8,
+                    "read": Math.random() > 0.5,
+                    "timestamp": new Date(Date.now() - Math.random() * 604800000).toISOString() // случайное время за последнюю неделю
+                });
+            }
+
+            alertsData = sampleData.alerts;
+            filteredAlerts = [...alertsData];
+
+            updateStats();
+            renderAlerts();
+
+            // Сохраняем в localStorage для демонстрации
+            localStorage.setItem('alertsData', JSON.stringify(alertsData));
+
+        } catch (error) {
+            console.error('Error loading alerts:', error);
+            showError('Не удалось загрузить уведомления');
+        }
+    }
+
+    // ========== РЕНДЕРИНГ УВЕДОМЛЕНИЙ ==========
+    function renderAlerts() {
+        const container = document.getElementById('alertsContainer');
+
+        if (filteredAlerts.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔔</div>
+                    <h2 class="empty-state-title">Уведомлений нет</h2>
+                    <p class="empty-state-message">
+                        Здесь будут появляться ваши торговые сигналы и оповещения.
+                        Настройте параметры анализа, чтобы получать уведомления.
+                    </p>
+                    <button class="btn btn-register" onclick="window.location.href='/analyze_settings'">
+                        Настроить анализ
+                    </button>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = filteredAlerts.map(alert => {
+            const date = new Date(alert.timestamp);
+            const timeAgo = getTimeAgo(date);
+            const isToday = isDateToday(date);
+
+            return `
+                <div class="alert-card ${alert.read ? '' : 'unread'} ${alert.silent ? 'silent' : ''}">
+                    ${!alert.read ? '<div class="notification-badge">!</div>' : ''}
+
+                    <div class="alert-header">
+                        <div>
+                            <h3 class="alert-title">
+                                ${alert.title}
+                                <span class="alert-type ${alert.type}">${getTypeLabel(alert.type)}</span>
+                            </h3>
+                            <div class="alert-meta">
+                                <span class="alert-id">ID: ${alert.id}</span>
+                                <span>${timeAgo}</span>
+                                ${isToday ? '<span style="color: var(--accent-color)">✦ Сегодня</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert-message">
+                        ${formatAlertMessage(alert.message)}
+                    </div>
+
+                    <div class="alert-footer">
+                        <div class="alert-actions">
+                            ${!alert.read ? `
+                                <button class="btn btn-small btn-mark-read" onclick="markAsRead(${alert.id})">
+                                    ✓ Отметить прочитанным
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-small btn-delete" onclick="deleteAlert(${alert.id})">
+                                ✕ Удалить
+                            </button>
+                        </div>
+                        <div class="alert-time">
+                            ${date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            })}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function formatAlertMessage(message) {
+        // Парсим сообщение для лучшего отображения
+        const parts = message.split(' | ');
+        return parts.map(part => {
+            if (part.includes('Вероятность:')) {
+                const prob = part.match(/\d+/)?.[0];
+                return `<span style="color: ${getProbabilityColor(prob)}">${part}</span>`;
+            }
+            if (part.includes('ЦЕНА:')) {
+                return `<strong>${part}</strong>`;
+            }
+            if (part.includes('TP:') || part.includes('SL:')) {
+                const [label, value] = part.split(': ');
+                const color = label === 'TP:' ? 'var(--positive)' : 'var(--negative)';
+                return `<span style="color: ${color}">${label} <strong>${value}</strong></span>`;
+            }
+            return part;
+        }).join(' | ');
+    }
+
+    function getProbabilityColor(probability) {
+        const prob = parseInt(probability);
+        if (prob >= 80) return 'var(--positive)';
+        if (prob >= 60) return 'var(--alert-warning)';
+        return 'var(--negative)';
+    }
+
+    function getTypeLabel(type) {
+        const labels = {
+            'alerts': 'Сигнал',
+            'warning': 'Предупреждение',
+            'success': 'Успех',
+            'error': 'Ошибка'
+        };
+        return labels[type] || type;
+    }
+
+    function getTimeAgo(date) {
+        const now = new Date();
+        const diff = now - date;
+
+        const minute = 60 * 1000;
+        const hour = 60 * minute;
+        const day = 24 * hour;
+
+        if (diff < minute) return 'Только что';
+        if (diff < hour) return `${Math.floor(diff / minute)} мин. назад`;
+        if (diff < day) return `${Math.floor(diff / hour)} ч. назад`;
+        if (diff < 7 * day) return `${Math.floor(diff / day)} дн. назад`;
+
+        return date.toLocaleDateString('ru-RU');
+    }
+
+    function isDateToday(date) {
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+    }
+
+    // ========== ФИЛЬТРАЦИЯ И ПОИСК ==========
+    function filterAlerts() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filterValue = document.getElementById('filterSelect').value;
+
+        filteredAlerts = alertsData.filter(alert => {
+            // Поиск
+            const matchesSearch = !searchTerm ||
+                alert.title.toLowerCase().includes(searchTerm) ||
+                alert.message.toLowerCase().includes(searchTerm);
+
+            // Фильтрация
+            let matchesFilter = true;
+            switch(filterValue) {
+                case 'unread':
+                    matchesFilter = !alert.read;
+                    break;
+                case 'alerts':
+                    matchesFilter = alert.type === 'alerts';
+                    break;
+            }
+
+            return matchesSearch && matchesFilter;
+        });
+
+        renderAlerts();
+        updateStats();
+    }
+
+    // ========== ОБНОВЛЕНИЕ СТАТИСТИКИ ==========
+    function updateStats() {
+        const total = alertsData.length;
+        const unread = alertsData.filter(a => !a.read).length;
+        const today = alertsData.filter(a => isDateToday(new Date(a.timestamp))).length;
+        const tradeSignals = alertsData.filter(a => a.type === 'alerts').length;
+
+        document.getElementById('totalAlerts').textContent = total;
+        document.getElementById('unreadAlerts').textContent = unread;
+        document.getElementById('todayAlerts').textContent = today;
+        document.getElementById('tradeSignals').textContent = tradeSignals;
+    }
+
+    // ========== ДЕЙСТВИЯ С УВЕДОМЛЕНИЯМИ ==========
+    function markAsRead(alertId) {
+        const alert = alertsData.find(a => a.id === alertId);
+        if (alert) {
+            alert.read = true;
+            saveAlertsData();
+            filterAlerts();
+            showNotification('Уведомление прочитано', 'Уведомление отмечено как прочитанное');
+        }
+    }
+
+    function markAllAsRead() {
+        alertsData.forEach(alert => alert.read = true);
+        saveAlertsData();
+        filterAlerts();
+        showNotification('Все уведомления прочитаны', 'Все уведомления отмечены как прочитанные');
+    }
+
+    function deleteAlert(alertId) {
+        if (confirm('Вы уверены, что хотите удалить это уведомление?')) {
+            alertsData = alertsData.filter(a => a.id !== alertId);
+            saveAlertsData();
+            filterAlerts();
+            showNotification('Уведомление удалено', 'Уведомление было успешно удалено');
+        }
+    }
+
+    function saveAlertsData() {
+        localStorage.setItem('alertsData', JSON.stringify(alertsData));
+    }
+
+    // ========== ТЕМНАЯ/СВЕТЛАЯ ТЕМА ==========
+    function initializeTheme() {
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeButton(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        });
+    }
+
+    function updateThemeButton(theme) {
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    }
+
+    // ========== EVENT LISTENERS ==========
+    function setupEventListeners() {
+        document.getElementById('searchInput').addEventListener('input', filterAlerts);
+        document.getElementById('filterSelect').addEventListener('change', filterAlerts);
+        document.getElementById('markAllReadBtn').addEventListener('click', markAllAsRead);
+    }
+
+    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+    function showNotification(title, message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification-toast show';
+        notification.innerHTML = `
+            <div class="notification-header">
+                <div class="notification-title">${title}</div>
+                <div class="notification-time">Только что</div>
+            </div>
+            <div class="notification-message">${message}</div>
+        `;
+
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(0);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.transform = 'translateX(400px)';
+            setTimeout(() => notification.remove(), 500);
+        }, 5000);
+
+        notification.addEventListener('click', function() {
+            this.style.transform = 'translateX(400px)';
+            setTimeout(() => this.remove(), 500);
+        });
+    }
+
+    function showError(message) {
+        const container = document.getElementById('alertsContainer');
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">⚠️</div>
+                <h2 class="empty-state-title">Ошибка загрузки</h2>
+                <p class="empty-state-message">${message}</p>
+                <button class="btn btn-register" onclick="loadAlertsData()">
+                    Повторить попытку
+                </button>
+            </div>
+        `;
+    }
+
+    // Функции для работы с cookies (из оригинального скрипта)
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+    function updateAuthButtons() {
+        const userCookie = getCookie('user');
+        // Реализация обновления кнопок авторизации
+    }
+</script>
+</body>
+</html>

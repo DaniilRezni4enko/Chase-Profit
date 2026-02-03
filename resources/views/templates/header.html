@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+{{template "alerts"}}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChaseProfit - Лучший торговый ассистент</title>
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@3.8.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        /* Все стили остаются без изменений */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0e0e0e;
+            --secondary-bg: #1a1a1a;
+            --accent-color: #00c087;
+            --accent-hover: #00a871;
+            --text-primary: #ffffff;
+            --text-secondary: #848e9c;
+            --border-color: #2a2a2a;
+            --positive: #00c087;
+            --negative: #f6465d;
+            --card-bg: #151515;
+            --chart-bg: #121212;
+        }
+
+        [data-theme="light"] {
+            --primary-bg: #ffffff;
+            --secondary-bg: #f8f9fa;
+            --accent-color: #00c087;
+            --accent-hover: #00a871;
+            --text-primary: #1a1a1a;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --positive: #00c087;
+            --negative: #f6465d;
+            --card-bg: #ffffff;
+            --chart-bg: #f8f9fa;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* Все остальные стили без изменений */
+        .header {
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 14px;
+        }
+
+        .btn-login {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-register {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-register:hover {
+            background: var(--accent-hover);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text-primary);
+            background: var(--card-bg);
+        }
+
+        .main-content {
+            margin-top: 64px;
+            min-height: calc(100vh - 64px);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary-bg) 0%, var(--secondary-bg) 100%);
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--accent-color), #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .trading-section {
+            padding: 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .currency-search-section {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-container {
+            width: 100%;
+            position: relative;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 192, 135, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-top: 5px;
+        }
+
+        .suggestions-dropdown.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(0, 192, 135, 0.1);
+        }
+
+        .suggestion-item.selected {
+            background: rgba(0, 192, 135, 0.2);
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .currency-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .currency-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+        }
+
+        .currency-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .currency-symbol {
+            font-weight: bold;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .currency-name {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .currency-price {
+            text-align: right;
+        }
+
+        .price-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .price-change {
+            font-size: 12px;
+        }
+
+        .price-change.positive {
+            color: var(--positive);
+        }
+
+        .price-change.negative {
+            color: var(--negative);
+        }
+
+        .selected-currency-display {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .selected-currency-display.active {
+            display: block;
+        }
+
+        .selected-currency-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .selected-currency-title {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .selected-currency-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .selected-currency-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: var(--secondary-bg);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .symbol-selector {
+            padding: 8px 12px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .timeframe-selector {
+            display: flex;
+            gap: 5px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .timeframe-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .timeframe-btn.active {
+            background: var(--accent-color);
+            color: var(--primary-bg);
+        }
+
+        .timeframe-btn:hover:not(.active) {
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+
+        .trading-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: var(--chart-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #candlestick-chart {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+        }
+
+        .chart-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--secondary-bg);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            z-index: 100;
+        }
+
+        .market-section {
+            padding: 60px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .market-table {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            padding: 20px;
+            background: var(--secondary-bg);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .table-row:hover {
+            background: var(--secondary-bg);
+        }
+
+        .coin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coin-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+        }
+
+        .coin-name {
+            font-weight: 600;
+        }
+
+        .coin-symbol {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .price-up {
+            color: var(--positive);
+        }
+
+        .price-down {
+            color: var(--negative);
+        }
+
+        .features {
+            padding: 80px 20px;
+            background: var(--secondary-bg);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer {
+            background: var(--secondary-bg);
+            padding: 40px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-column h3 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 40px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: var(--text-secondary);
+            gap: 10px;
+        }
+
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .trading-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .table-header, .table-row {
+                grid-template-columns: 2fr 1fr 1fr;
+            }
+
+            .table-header :nth-child(4),
+            .table-header :nth-child(5),
+            .table-row :nth-child(4),
+            .table-row :nth-child(5) {
+                display: none;
+            }
+
+            .selected-currency-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="nav-container">
+        <div class="logo">
+            <span>⚡</span>
+            ChaseProfit
+        </div>
+        <nav class="nav-menu">
+            <a href="/user_alerts" class="nav-item">Уведомления</a>
+            <a href="/vallets" class="nav-item">Валюты</a>
+            <a href="/about_us" class="nav-item">О нас</a>
+            <a href="/analyze_settings" class="nav-item">Настройки анализа</a>
+        </nav>
+        <div class="nav-actions">
+            <button class="theme-toggle" id="themeToggle">🌙</button>
+            <button class="btn btn-login"><a href="/auth">Войти</a></button>
+            <button class="btn btn-register"><a href="/register">Зарегистрироваться</a></button>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Торгуйте криптовалютой как профессионал</h1>
+            <p>Продвинутая торговая платформа с графиками в реальном времени, уведомлениями и профессиональными инструментами</p>
+            <button class="btn btn-register" style="padding: 12px 30px; font-size: 16px;" id="startTradingBtn">Начать торговать</button>
+        </div>
+    </section>
+
+    <!-- Trading Section -->
+    <section class="trading-section">
+        <div class="section-header">
+            <h2 class="section-title">Продвинутая Торговля</h2>
+        </div>
+
+        <div class="currency-search-section">
+            <div class="search-container">
+                <div class="search-input-wrapper">
+                    <input
+                            type="text"
+                            class="search-input"
+                            id="currencySearch"
+                            placeholder="Введите код валюты: (BTC, ETH, SOL...)"
+                            autocomplete="off"
+                    >
+                    <div class="search-icon">🔍</div>
+
+                    <div class="suggestions-dropdown" id="suggestionsDropdown">
+                        <!-- Suggestions will appear here -->
+                    </div>
+                </div>
+
+                <div class="selected-currency-display" id="selectedCurrencyDisplay">
+                    <!-- Selected currency info will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Chart Controls -->
+        <div class="chart-controls">
+            <select class="symbol-selector" id="symbolSelector">
+                <option value="BTCUSDT">BTC/USDT</option>
+                <option value="ETHUSDT">ETH/USDT</option>
+                <option value="BNBUSDT">BNB/USDT</option>
+                <option value="SOLUSDT">SOL/USDT</option>
+                <option value="ADAUSDT">ADA/USDT</option>
+                <option value="XRPUSDT">XRP/USDT</option>
+                <option value="DOGEUSDT">DOGE/USDT</option>
+                <option value="DOTUSDT">DOT/USDT</option>
+            </select>
+            <div class="timeframe-selector">
+                <button class="timeframe-btn active" data-timeframe="1m">1m</button>
+                <button class="timeframe-btn" data-timeframe="5m">5m</button>
+                <button class="timeframe-btn" data-timeframe="15m">15m</button>
+                <button class="timeframe-btn" data-timeframe="1h">1h</button>
+                <button class="timeframe-btn" data-timeframe="4h">4h</button>
+                <button class="timeframe-btn" data-timeframe="1d">1d</button>
+            </div>
+        </div>
+
+        <div class="trading-container">
+            <div class="chart-container">
+                <div id="candlestick-chart"></div>
+                <div class="chart-status" id="chartStatus">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <span>Loading chart data...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Market Section -->
+    <section class="market-section">
+        <div class="section-header">
+            <h2 class="section-title">Популярные валютные пары (Live)</h2>
+            <button class="btn btn-login" onclick="refreshMarketData()">
+                <span>🔄</span> Refresh
+            </button>
+        </div>
+        <div class="market-table">
+            <div class="table-header">
+                <div>Pair</div>
+                <div>Price</div>
+                <div>24h Change</div>
+                <div>24h Volume</div>
+                <div>Action</div>
+            </div>
+            <div id="market-table-body">
+                <!-- Market data will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Secure Storage</h3>
+                <p class="feature-desc">Multi-layer security with cold storage and insurance protection for your assets.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💨</div>
+                <h3 class="feature-title">Fast Execution</h3>
+                <p class="feature-desc">High-performance matching engine with sub-millisecond order execution.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Advanced Charts</h3>
+                <p class="feature-desc">Professional trading tools with advanced charting and technical indicators.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔔</div>
+                <h3 class="feature-title">Smart Notifications</h3>
+                <p class="feature-desc">Real-time alerts and notifications for price movements and trading opportunities.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // ========== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==========
+    let allCurrencies = [];
+    let selectedCurrency = null;
+    let currentSymbol = 'BTCUSDT';
+    let currentTimeframe = '1m';
+    let chart = null;
+    let candlestickSeries = null;
+    let wsConnection = null;
+    let marketData = [];
+    let priceUpdateInterval = null;
+
+    // Популярные криптовалюты
+    const POPULAR_SYMBOLS = [
+        { symbol: 'BTCUSDT', name: 'Bitcoin', icon: '₿' },
+        { symbol: 'ETHUSDT', name: 'Ethereum', icon: 'Ξ' },
+        { symbol: 'BNBUSDT', name: 'Binance Coin', icon: 'B' },
+        { symbol: 'SOLUSDT', name: 'Solana', icon: 'S' },
+        { symbol: 'XRPUSDT', name: 'Ripple', icon: 'X' },
+        { symbol: 'ADAUSDT', name: 'Cardano', icon: 'A' },
+        { symbol: 'DOGEUSDT', name: 'Dogecoin', icon: 'Ð' },
+        { symbol: 'DOTUSDT', name: 'Polkadot', icon: '●' },
+        { symbol: 'AVAXUSDT', name: 'Avalanche', icon: 'A' },
+        { symbol: 'MATICUSDT', name: 'Polygon', icon: 'M' },
+        { symbol: 'LTCUSDT', name: 'Litecoin', icon: 'Ł' },
+        { symbol: 'UNIUSDT', name: 'Uniswap', icon: 'U' },
+        { symbol: 'LINKUSDT', name: 'Chainlink', icon: '⛓' },
+        { symbol: 'ATOMUSDT', name: 'Cosmos', icon: '⚛' },
+        { symbol: 'ETCUSDT', name: 'Ethereum Classic', icon: 'Ξ' }
+    ];
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing ChaseProfit...');
+        updateAuthButtons();
+        initializeTheme();
+        initializeCurrencySearch();
+        initializeChart();
+        loadPopularCurrencies();
+        updateChartData();
+        fetchMarketData();
+        startPriceUpdates();
+    });
+
+    // ========== ОБНОВЛЕНИЕ ЦЕН В РЕАЛЬНОМ ВРЕМЕНИ ==========
+    function startPriceUpdates() {
+        if (priceUpdateInterval) {
+            clearInterval(priceUpdateInterval);
+        }
+
+        // Обновляем сразу при запуске
+        updateAllPrices();
+
+        // Затем обновляем каждые 3 секунды
+        priceUpdateInterval = setInterval(async () => {
+            await updateAllPrices();
+        }, 3000);
+    }
+
+    async function updateAllPrices() {
+        try {
+            await updatePopularCurrenciesPrices();
+            await updateMarketDataFromAPI();
+            updateMarketTablePrices();
+
+            if (selectedCurrency) {
+                await updateSelectedCurrencyRealTime();
+            }
+        } catch (error) {
+            console.error('Error updating prices:', error);
+        }
+    }
+
+    async function updatePopularCurrenciesPrices() {
+        try {
+            // Берем только топ 10 для запроса (чтобы не перегружать API)
+            const topSymbols = POPULAR_SYMBOLS.slice(0, 10);
+            const symbols = topSymbols.map(coin => coin.symbol).join(',');
+
+            const response = await fetch(
+                `https://api.bybit.com/v5/market/tickers?category=spot&symbol=${symbols}`,
+                {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.retCode === 0 && data.result && data.result.list) {
+                    data.result.list.forEach(ticker => {
+                        const index = allCurrencies.findIndex(c => c.symbol === ticker.symbol);
+                        if (index !== -1) {
+                            const newPrice = parseFloat(ticker.lastPrice);
+                            const newChange = parseFloat(ticker.price24hPcnt) * 100;
+                            const newVolume = parseFloat(ticker.volume24h);
+
+                            allCurrencies[index].price = newPrice;
+                            allCurrencies[index].change = newChange;
+                            allCurrencies[index].volume = newVolume;
+
+                            // Обновляем marketData для таблицы
+                            const marketIndex = marketData.findIndex(m => m.symbol === ticker.symbol);
+                            if (marketIndex !== -1) {
+                                marketData[marketIndex].price = newPrice;
+                                marketData[marketIndex].change = newChange;
+                                marketData[marketIndex].volume = newVolume;
+                            }
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('Error updating popular currencies:', error);
+        }
+    }
+
+    async function updateMarketDataFromAPI() {
+        try {
+            const response = await fetch('https://api.bybit.com/v5/market/tickers?category=spot');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.retCode === 0 && data.result && data.result.list) {
+                    // Обновляем первые 15 пар для таблицы
+                    marketData = data.result.list.slice(0, 15).map(ticker => ({
+                        symbol: ticker.symbol,
+                        name: ticker.symbol.replace('USDT', ''),
+                        price: parseFloat(ticker.lastPrice),
+                        change: parseFloat(ticker.price24hPcnt) * 100,
+                        volume: parseFloat(ticker.volume24h),
+                        icon: getCoinIcon(ticker.symbol.replace('USDT', ''))
+                    }));
+                }
+            }
+        } catch (error) {
+            console.error('Error updating market data:', error);
+        }
+    }
+
+    function updateMarketTablePrices() {
+        const tableBody = document.getElementById('market-table-body');
+        if (!tableBody || marketData.length === 0) return;
+
+        tableBody.innerHTML = '';
+
+        marketData.forEach(coin => {
+            const row = document.createElement('div');
+            row.className = 'table-row';
+
+            const changeClass = coin.change >= 0 ? 'price-up' : 'price-down';
+            const changeSign = coin.change >= 0 ? '+' : '';
+
+            row.innerHTML = `
+                <div class="coin-info">
+                    <div class="coin-icon">${coin.icon}</div>
+                    <div>
+                        <div class="coin-name">${coin.name}</div>
+                        <div class="coin-symbol">${coin.symbol}</div>
+                    </div>
+                </div>
+                <div class="price-cell">$${formatPrice(coin.price)}</div>
+                <div class="${changeClass}">${changeSign}${coin.change.toFixed(2)}%</div>
+                <div>$${formatNumber(coin.volume)}</div>
+                <div>
+                    <button class="btn btn-register" style="padding: 6px 12px; font-size: 12px;"
+                            onclick="tradePair('${coin.symbol}')">Trade</button>
+                </div>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    async function updateSelectedCurrencyRealTime() {
+        if (!selectedCurrency) return;
+
+        try {
+            const response = await fetch(
+                `https://api.bybit.com/v5/market/tickers?category=spot&symbol=${selectedCurrency.symbol}`,
+                {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                }
+            );
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.retCode === 0 && data.result && data.result.list && data.result.list[0]) {
+                    const ticker = data.result.list[0];
+                    createSelectedCurrencyDisplay(ticker);
+                }
+            }
+        } catch (error) {
+            console.error('Error updating selected currency:', error);
+        }
+    }
+
+    function createSelectedCurrencyDisplay(ticker) {
+        const displayContainer = document.getElementById('selectedCurrencyDisplay');
+        if (!displayContainer) return;
+
+        const price = parseFloat(ticker.lastPrice);
+        const change24h = parseFloat(ticker.price24hPcnt) * 100;
+        const high24h = parseFloat(ticker.highPrice24h);
+        const low24h = parseFloat(ticker.lowPrice24h);
+        const volume24h = parseFloat(ticker.volume24h);
+        const isPositive = change24h >= 0;
+
+        displayContainer.innerHTML = `
+            <div class="selected-currency-header">
+                <div class="selected-currency-title">
+                    <span class="currency-icon">${selectedCurrency.icon || selectedCurrency.symbol.charAt(0)}</span>
+                    <span>${selectedCurrency.name} (${selectedCurrency.symbol})</span>
+                </div>
+                <div class="selected-currency-price">$${formatPrice(price)}</div>
+            </div>
+            <div class="selected-currency-stats">
+                <div class="stat-card">
+                    <div class="stat-label">24h Изменение</div>
+                    <div class="stat-value ${isPositive ? 'positive' : 'negative'}">
+                        ${isPositive ? '+' : ''}${change24h.toFixed(2)}%
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">24h High</div>
+                    <div class="stat-value">$${formatPrice(high24h)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">24h Low</div>
+                    <div class="stat-value">$${formatPrice(low24h)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">24h Volume</div>
+                    <div class="stat-value">$${formatNumber(volume24h)}</div>
+                </div>
+            </div>
+        `;
+
+        displayContainer.classList.add('active');
+    }
+
+    function formatPrice(price) {
+        if (price >= 1000) {
+            return price.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        } else if (price >= 1) {
+            return price.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 4
+            });
+        } else {
+            return price.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 8
+            });
+        }
+    }
+
+    // ========== СИСТЕМА ПОИСКА ВАЛЮТ ==========
+    function initializeCurrencySearch() {
+        const searchInput = document.getElementById('currencySearch');
+        const suggestionsDropdown = document.getElementById('suggestionsDropdown');
+
+        searchInput.addEventListener('input', function(e) {
+            const query = e.target.value.trim().toUpperCase();
+            if (query.length < 1) {
+                suggestionsDropdown.classList.remove('active');
+                return;
+            }
+
+            const filtered = allCurrencies.filter(currency =>
+                currency.symbol.includes(query) ||
+                currency.name.toLowerCase().includes(query.toLowerCase())
+            );
+
+            displaySuggestions(filtered.slice(0, 10));
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !suggestionsDropdown.contains(e.target)) {
+                suggestionsDropdown.classList.remove('active');
+            }
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+            const suggestions = suggestionsDropdown.querySelectorAll('.suggestion-item');
+            const activeSuggestion = suggestionsDropdown.querySelector('.suggestion-item.selected');
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (suggestions.length > 0) {
+                    let next = activeSuggestion ?
+                        activeSuggestion.nextElementSibling :
+                        suggestions[0];
+                    if (next) selectSuggestion(next);
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (suggestions.length > 0) {
+                    let prev = activeSuggestion ?
+                        activeSuggestion.previousElementSibling :
+                        suggestions[suggestions.length - 1];
+                    if (prev) selectSuggestion(prev);
+                }
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (activeSuggestion) {
+                    const symbol = activeSuggestion.dataset.symbol;
+                    const name = activeSuggestion.dataset.name;
+                    const icon = activeSuggestion.dataset.icon;
+                    selectCurrency(symbol, name, icon);
+                    suggestionsDropdown.classList.remove('active');
+                    searchInput.value = '';
+                }
+            } else if (e.key === 'Escape') {
+                suggestionsDropdown.classList.remove('active');
+            }
+        });
+    }
+
+    function loadPopularCurrencies() {
+        allCurrencies = POPULAR_SYMBOLS.map(coin => ({
+            ...coin,
+            price: 0,
+            change: 0,
+            volume: 0
+        }));
+        console.log('Loaded popular currencies:', allCurrencies.length);
+    }
+
+    function displaySuggestions(currencies) {
+        const suggestionsDropdown = document.getElementById('suggestionsDropdown');
+
+        if (currencies.length === 0) {
+            suggestionsDropdown.innerHTML = `
+                <div class="suggestion-item">
+                    <div class="currency-info">
+                        <div class="currency-name">No results found</div>
+                    </div>
+                </div>
+            `;
+            suggestionsDropdown.classList.add('active');
+            return;
+        }
+
+        let html = '';
+        currencies.forEach(currency => {
+            const price = currency.price || 0;
+            const change = currency.change || 0;
+            const isPositive = change >= 0;
+
+            html += `
+                <div class="suggestion-item"
+                     data-symbol="${currency.symbol}"
+                     data-name="${currency.name}"
+                     data-icon="${currency.icon}"
+                     onclick="selectCurrency('${currency.symbol}', '${currency.name}', '${currency.icon}')"
+                     onmouseover="hoverSuggestion(this)">
+                    <div class="currency-info">
+                        <div class="currency-icon">${currency.icon || currency.symbol.charAt(0)}</div>
+                        <div class="currency-details">
+                            <div class="currency-symbol">${currency.symbol}</div>
+                            <div class="currency-name">${currency.name}</div>
+                        </div>
+                    </div>
+                    <div class="currency-price">
+                        <div class="price-value">${price > 0 ? `$${formatPrice(price)}` : 'Loading...'}</div>
+                        <div class="price-change ${isPositive ? 'positive' : 'negative'}">
+                            ${price > 0 ? `${isPositive ? '+' : ''}${change.toFixed(2)}%` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        suggestionsDropdown.innerHTML = html;
+        suggestionsDropdown.classList.add('active');
+    }
+
+    function hoverSuggestion(element) {
+        const suggestions = document.querySelectorAll('.suggestion-item');
+        suggestions.forEach(s => s.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    function selectSuggestion(element) {
+        const suggestions = document.querySelectorAll('.suggestion-item');
+        suggestions.forEach(s => s.classList.remove('selected'));
+        element.classList.add('selected');
+        element.scrollIntoView({ block: 'nearest' });
+    }
+
+    async function selectCurrency(symbol, name, icon = null) {
+        selectedCurrency = { symbol, name, icon };
+
+        // Обновляем селектор графика
+        const symbolSelector = document.getElementById('symbolSelector');
+        symbolSelector.value = symbol;
+        currentSymbol = symbol;
+
+        // Обновляем данные
+        await updateSelectedCurrencyRealTime();
+        updateChartData();
+
+        // Показываем уведомление
+        showNotification('Currency Selected', `${name} (${symbol}) selected for trading`);
+    }
+
+    // ========== ТЕМНАЯ/СВЕТЛАЯ ТЕМА ==========
+    function initializeTheme() {
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        updateThemeButton(currentTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+            updateChartTheme(newTheme);
+        });
+    }
+
+    function updateThemeButton(theme) {
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+    }
+
+    // ========== ГРАФИКИ ==========
+    function initializeChart() {
+        const chartContainer = document.getElementById('candlestick-chart');
+
+        chart = LightweightCharts.createChart(chartContainer, {
+            width: chartContainer.clientWidth,
+            height: chartContainer.clientHeight,
+            layout: {
+                background: { color: 'transparent' },
+                textColor: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary'),
+            },
+            grid: {
+                vertLines: { color: getComputedStyle(document.documentElement).getPropertyValue('--border-color') },
+                horzLines: { color: getComputedStyle(document.documentElement).getPropertyValue('--border-color') },
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+            },
+            rightPriceScale: {
+                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--border-color'),
+            },
+            timeScale: {
+                borderColor: getComputedStyle(document.documentElement).getPropertyValue('--border-color'),
+                timeVisible: true,
+                secondsVisible: false,
+            },
+        });
+
+        candlestickSeries = chart.addCandlestickSeries({
+            upColor: getComputedStyle(document.documentElement).getPropertyValue('--positive'),
+            downColor: getComputedStyle(document.documentElement).getPropertyValue('--negative'),
+            borderDownColor: getComputedStyle(document.documentElement).getPropertyValue('--negative'),
+            borderUpColor: getComputedStyle(document.documentElement).getPropertyValue('--positive'),
+            wickDownColor: getComputedStyle(document.documentElement).getPropertyValue('--negative'),
+            wickUpColor: getComputedStyle(document.documentElement).getPropertyValue('--positive'),
+        });
+
+        window.addEventListener('resize', () => {
+            chart.applyOptions({
+                width: chartContainer.clientWidth,
+                height: chartContainer.clientHeight,
+            });
+        });
+    }
+
+    function updateChartTheme(theme) {
+        const textColor = theme === 'dark' ? '#848e9c' : '#6c757d';
+        const borderColor = theme === 'dark' ? '#2a2a2a' : '#dee2e6';
+        const upColor = '#00c087';
+        const downColor = '#f6465d';
+
+        chart.applyOptions({
+            layout: {
+                textColor: textColor,
+            },
+            grid: {
+                vertLines: { color: borderColor },
+                horzLines: { color: borderColor },
+            },
+            rightPriceScale: {
+                borderColor: borderColor,
+            },
+            timeScale: {
+                borderColor: borderColor,
+            },
+        });
+
+        candlestickSeries.applyOptions({
+            upColor: upColor,
+            downColor: downColor,
+            borderDownColor: downColor,
+            borderUpColor: upColor,
+            wickDownColor: downColor,
+            wickUpColor: upColor,
+        });
+    }
+
+    async function updateChartData() {
+        try {
+            updateChartStatus('Loading chart data...');
+
+            const chartData = await fetchChartDataFromBybit(currentSymbol, currentTimeframe);
+
+            if (chartData && chartData.length > 0) {
+                candlestickSeries.setData(chartData);
+                updateChartStatus(`Live: ${currentSymbol} ${currentTimeframe}`);
+                setupWebSocket(currentSymbol, currentTimeframe.toLowerCase());
+            } else {
+                updateChartStatus('Using sample data');
+                loadSampleData();
+            }
+        } catch (error) {
+            console.error('Error updating chart:', error);
+            updateChartStatus('Error loading data');
+            loadSampleData();
+        }
+    }
+
+    async function fetchChartDataFromBybit(symbol, interval) {
+        try {
+            const intervalMap = {
+                '1m': '1',
+                '5m': '5',
+                '15m': '15',
+                '1h': '60',
+                '4h': '240',
+                '1d': 'D'
+            };
+
+            const bybitInterval = intervalMap[interval] || '1';
+
+            const response = await fetch(
+                `https://api.bybit.com/v5/market/kline?category=spot&symbol=${symbol}&interval=${bybitInterval}&limit=100`,
+                {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.retCode === 0 && data.result && data.result.list) {
+                const candles = data.result.list.reverse().map(item => {
+                    const [timestamp, open, high, low, close, volume] = item;
+                    return {
+                        time: parseInt(timestamp) / 1000,
+                        open: parseFloat(open),
+                        high: parseFloat(high),
+                        low: parseFloat(low),
+                        close: parseFloat(close),
+                        volume: parseFloat(volume)
+                    };
+                });
+
+                console.log(`Loaded ${candles.length} candles from Bybit for ${symbol}`);
+                return candles;
+            }
+
+            return null;
+        } catch (error) {
+            console.log('Bybit API недоступен, используем fallback:', error.message);
+            return null;
+        }
+    }
+
+    function setupWebSocket(symbol, interval) {
+        if (wsConnection) {
+            wsConnection.close();
+        }
+
+        wsConnection = new WebSocket(`wss://stream.bybit.com/v5/public/spot`);
+
+        wsConnection.onopen = () => {
+            const subscribeMsg = {
+                op: "subscribe",
+                args: [`kline.${interval}.${symbol}`]
+            };
+            wsConnection.send(JSON.stringify(subscribeMsg));
+            updateChartStatus(`Live: ${symbol} ${interval}`);
+        };
+
+        wsConnection.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                if (data.data && data.data[0]) {
+                    const kline = data.data[0];
+                    const newCandle = {
+                        time: kline.start / 1000,
+                        open: parseFloat(kline.open),
+                        high: parseFloat(kline.high),
+                        low: parseFloat(kline.low),
+                        close: parseFloat(kline.close),
+                    };
+                    candlestickSeries.update(newCandle);
+                }
+            } catch (error) {
+                console.error('WebSocket message error:', error);
+            }
+        };
+
+        wsConnection.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            updateChartStatus('Connection error');
+        };
+
+        wsConnection.onclose = () => {
+            setTimeout(() => setupWebSocket(symbol, interval), 3000);
+        };
+    }
+
+    function updateChartStatus(status) {
+        const chartStatus = document.getElementById('chartStatus');
+        if (typeof status === 'string') {
+            chartStatus.innerHTML = status;
+        } else {
+            chartStatus.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <span>${status}</span>
+                </div>
+            `;
+        }
+    }
+
+    function loadSampleData() {
+        const sampleData = [];
+        const baseTime = Math.floor(Date.now() / 1000) - 86400;
+        let price = 45000;
+
+        for (let i = 0; i < 100; i++) {
+            const open = price;
+            const close = price + (Math.random() - 0.5) * 1000;
+            const high = Math.max(open, close) + Math.random() * 500;
+            const low = Math.min(open, close) - Math.random() * 500;
+
+            sampleData.push({
+                time: baseTime + (i * 900),
+                open: open,
+                high: high,
+                low: low,
+                close: close,
+            });
+
+            price = close;
+        }
+
+        candlestickSeries.setData(sampleData);
+    }
+
+    // ========== ДАННЫЕ РЫНКА ==========
+    async function fetchMarketData() {
+        try {
+            const response = await fetch('https://api.bybit.com/v5/market/tickers?category=spot');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.retCode === 0) {
+                    marketData = data.result.list.slice(0, 15).map(ticker => ({
+                        symbol: ticker.symbol,
+                        name: ticker.symbol.replace('USDT', ''),
+                        price: parseFloat(ticker.lastPrice),
+                        change: parseFloat(ticker.price24hPcnt) * 100,
+                        volume: parseFloat(ticker.volume24h),
+                        icon: getCoinIcon(ticker.symbol.replace('USDT', ''))
+                    }));
+
+                    updateMarketTablePrices();
+                    updateAllCurrenciesWithMarketData();
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching market data:', error);
+            useSampleMarketData();
+        }
+    }
+
+    function updateAllCurrenciesWithMarketData() {
+        marketData.forEach(ticker => {
+            const existing = allCurrencies.find(c => c.symbol === ticker.symbol);
+            if (existing) {
+                existing.price = ticker.price;
+                existing.change = ticker.change;
+                existing.volume = ticker.volume;
+            }
+        });
+    }
+
+    function getCoinIcon(symbol) {
+        const iconMap = {
+            'BTC': '₿', 'ETH': 'Ξ', 'BNB': 'B', 'SOL': 'S', 'XRP': 'X',
+            'ADA': 'A', 'DOGE': 'Ð', 'DOT': '●', 'AVAX': 'A', 'MATIC': 'M',
+            'LTC': 'Ł', 'UNI': 'U', 'LINK': '⛓', 'ATOM': '⚛', 'ETC': 'Ξ'
+        };
+        return iconMap[symbol] || symbol.charAt(0);
+    }
+
+    function useSampleMarketData() {
+        marketData = [
+            { symbol: 'BTCUSDT', name: 'Bitcoin', price: 45230.50, change: 2.34, volume: 2500000000, icon: '₿' },
+            { symbol: 'ETHUSDT', name: 'Ethereum', price: 2450.75, change: -1.23, volume: 1200000000, icon: 'Ξ' },
+            { symbol: 'BNBUSDT', name: 'Binance Coin', price: 325.60, change: 0.56, volume: 450000000, icon: 'B' },
+            { symbol: 'SOLUSDT', name: 'Solana', price: 102.45, change: 5.67, volume: 380000000, icon: 'S' },
+            { symbol: 'XRPUSDT', name: 'Ripple', price: 0.6234, change: -0.34, volume: 290000000, icon: 'X' },
+            { symbol: 'ADAUSDT', name: 'Cardano', price: 0.5123, change: 1.89, volume: 180000000, icon: 'A' },
+            { symbol: 'DOGEUSDT', name: 'Dogecoin', price: 0.1234, change: 3.45, volume: 150000000, icon: 'Ð' },
+            { symbol: 'DOTUSDT', name: 'Polkadot', price: 7.89, change: -2.34, volume: 120000000, icon: '●' },
+            { symbol: 'AVAXUSDT', name: 'Avalanche', price: 45.67, change: 4.56, volume: 95000000, icon: 'A' },
+            { symbol: 'MATICUSDT', name: 'Polygon', price: 0.89, change: 0.23, volume: 85000000, icon: 'M' }
+        ];
+        updateMarketTablePrices();
+    }
+
+    function formatNumber(num) {
+        if (num >= 1000000000) {
+            return (num / 1000000000).toFixed(2) + 'B';
+        } else if (num >= 1000000) {
+            return (num / 1000000).toFixed(2) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(2) + 'K';
+        }
+        return num.toFixed(2);
+    }
+
+    function refreshMarketData() {
+        fetchMarketData();
+        showNotification('Market Data', 'Refreshing market data...');
+    }
+
+    function tradePair(symbol) {
+        document.getElementById('symbolSelector').value = symbol;
+        currentSymbol = symbol;
+
+        const currency = allCurrencies.find(c => c.symbol === symbol);
+        if (currency) {
+            selectCurrency(symbol, currency.name, currency.icon);
+        } else {
+            updateChartData();
+        }
+
+        document.querySelector('.trading-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ========== EVENT LISTENERS ==========
+    document.getElementById('symbolSelector').addEventListener('change', function() {
+        currentSymbol = this.value;
+        updateChartData();
+    });
+
+    document.querySelectorAll('.timeframe-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentTimeframe = this.dataset.timeframe;
+            updateChartData();
+        });
+    });
+
+    document.getElementById('startTradingBtn').addEventListener('click', function() {
+        document.querySelector('.trading-section').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==========
+    function showNotification(title, message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification-toast show';
+        notification.innerHTML = `
+            <div class="notification-header">
+                <div class="notification-title">${title}</div>
+                <div class="notification-time">Прямо сейчас</div>
+            </div>
+            <div class="notification-message">${message}</div>
+        `;
+
+        notification.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            transform: translateX(0);
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.transform = 'translateX(400px)';
+            setTimeout(() => notification.remove(), 500);
+        }, 5000);
+
+        notification.addEventListener('click', function() {
+            this.style.transform = 'translateX(400px)';
+            setTimeout(() => this.remove(), 500);
+        });
+    }
+
+    function getCookie(name) {
+        let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        return matches ? decodeURIComponent(matches[1]) : undefined;
+    }
+
+    function updateAuthButtons() {
+        const userCookie = getCookie('user');
+
+        if (userCookie) {
+            const navActions = document.querySelector('.nav-actions');
+            const loginBtn = document.querySelector('.btn-login');
+            const registerBtn = document.querySelector('.btn-register');
+
+            if (navActions && loginBtn && registerBtn) {
+                loginBtn.remove();
+                registerBtn.remove();
+
+                const profileBtn = document.createElement('button');
+                profileBtn.className = 'btn btn-register';
+                profileBtn.innerHTML = '<a href="/profile" style="color: inherit; text-decoration: none;">Profile</a>';
+                navActions.insertBefore(profileBtn, navActions.firstChild);
+
+                const logoutBtn = document.createElement('button');
+                logoutBtn.className = 'btn btn-login';
+                logoutBtn.innerHTML = 'Log Out';
+                logoutBtn.style.marginLeft = '10px';
+                logoutBtn.onclick = function() {
+                    document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    location.reload();
+                };
+                navActions.appendChild(logoutBtn);
+            }
+
+            const heroBtn = document.querySelector('.hero .btn-register');
+            if (heroBtn) {
+                heroBtn.textContent = 'Go to Profile';
+                heroBtn.onclick = function() {
+                    window.location.href = '/profile';
+                };
+            }
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!-- Notifications Section -->
+<style>
+  .notifications-section {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  .btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    border: none;
+    font-size: 14px;
+  }
+
+  .btn-login {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+  }
+
+  .btn-login:hover {
+    background: var(--card-bg);
+  }
+
+  .notification-item {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: slideIn 0.3s ease;
+  }
+
+  .notification-item:hover {
+    transform: translateX(10px);
+    border-left: 4px solid var(--accent-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .notification-item.unread {
+    border-left: 4px solid var(--accent-color);
+    background: var(--secondary-bg);
+  }
+
+  .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .notification-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+  }
+
+  .notification-time {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+
+  .notification-message {
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* Анимации */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* CSS переменные для тем */
+  :root {
+    --primary-bg: #0e0e0e;
+    --secondary-bg: #1a1a1a;
+    --accent-color: #00c087;
+    --text-primary: #ffffff;
+    --text-secondary: #848e9c;
+    --border-color: #2a2a2a;
+    --card-bg: #151515;
+  }
+
+  [data-theme="light"] {
+    --primary-bg: #ffffff;
+    --secondary-bg: #f8f9fa;
+    --accent-color: #00c087;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --card-bg: #ffffff;
+  }
+</style>
+<section class="section" id="notifications-section">
+  <div class="notifications-section">
+    <div class="section-header">
+      <h2 class="section-title">Уведомления</h2>
+      <button class="btn btn-login" id="markAllRead">Mark All as Read</button>
+    </div>
+
+    <div id="notifications-list">
+      <!-- Уведомления будут здесь -->
+      <div class="notification-item unread">
+        <div class="notification-header">
+          <div class="notification-title">Order Filled</div>
+          <div class="notification-time">5m ago</div>
+        </div>
+        <div class="notification-message">Your BTC buy order at $45,230.50 has been filled</div>
+      </div>
+
+      <div class="notification-item unread">
+        <div class="notification-header">
+          <div class="notification-title">Price Alert</div>
+          <div class="notification-time">30m ago</div>
+        </div>
+        <div class="notification-message">BTC reached $45,000. Target price achieved</div>
+      </div>
+
+      <div class="notification-item">
+        <div class="notification-header">
+          <div class="notification-title">Welcome Bonus</div>
+          <div class="notification-time">1h ago</div>
+        </div>
+        <div class="notification-message">Claim your $10 welcome bonus for your first deposit</div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  // Notifications data
+  // Notifications data from JSON file
+  let notifications = [];
+
+  // Initialize notifications section
+  async function initializeNotificationsSection() {
+    await loadNotificationsFromJSON();
+    populateNotificationsList();
+
+    // Mark all as read button
+    document.getElementById('markAllRead').addEventListener('click', function() {
+      const userEmail = getUserEmailFromCookie();
+      notifications = notifications.map(notification => {
+        if (notification.email === userEmail) {
+          return { ...notification, read: true };
+        }
+        return notification;
+      });
+      populateNotificationsList();
+      updateNotificationBadge();
+      saveNotificationsToJSON(); // Сохраняем изменения
+    });
+  }
+
+  // Load notifications from JSON file
+  async function loadNotificationsFromJSON() {
+    try {
+      const response = await fetch('/Users/reznicenkodaniivsevolodovic/GolandProjects/Chase-Profit/alert.json'); // Путь к вашему JSON файлу
+      const allNotifications = await response.json();
+
+      const userEmail = getUserEmailFromCookie();
+      if (userEmail) {
+        // Фильтруем уведомления по email пользователя
+        notifications = allNotifications.filter(notification =>
+                notification.email === userEmail
+        );
+      } else {
+        notifications = [];
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+      notifications = [];
+    }
+  }
+
+  // Get user email from cookie
+  function getUserEmailFromCookie() {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'user') {
+        return decodeURIComponent(value);
+      }
+    }
+    return null;
+  }
+
+  // Populate notifications list
+  function populateNotificationsList() {
+    const list = document.getElementById('notifications-list');
+    list.innerHTML = '';
+
+    const userEmail = getUserEmailFromCookie();
+    if (!userEmail) {
+      list.innerHTML = '<div class="notification-item">Please log in to view notifications</div>';
+      return;
+    }
+
+    // Фильтруем уведомления для текущего пользователя и сортируем по времени
+    const userNotifications = notifications
+            .filter(notification => notification.email === userEmail)
+            .sort((a, b) => b.timestamp - a.timestamp);
+
+    if (userNotifications.length === 0) {
+      list.innerHTML = '<div class="notification-item">No notifications</div>';
+      return;
+    }
+
+    userNotifications.forEach(notification => {
+      const item = document.createElement('div');
+      item.className = `notification-item ${notification.read ? '' : 'unread'}`;
+      item.addEventListener('click', () => markNotificationAsRead(notification.id));
+
+      const timeAgo = getTimeAgo(notification.timestamp);
+
+      item.innerHTML = `
+            <div class="notification-header">
+                <div class="notification-title">${notification.title}</div>
+                <div class="notification-time">${timeAgo}</div>
+            </div>
+            <div class="notification-message">${notification.message}</div>
+        `;
+
+      list.appendChild(item);
+    });
+  }
+
+  // Mark notification as read
+  function markNotificationAsRead(id) {
+    const userEmail = getUserEmailFromCookie();
+    const notificationIndex = notifications.findIndex(n => n.id === id && n.email === userEmail);
+
+    if (notificationIndex !== -1 && !notifications[notificationIndex].read) {
+      notifications[notificationIndex].read = true;
+      populateNotificationsList();
+      updateNotificationBadge();
+      saveNotificationsToJSON(); // Сохраняем изменения
+    }
+  }
+
+  // Format time ago
+  function getTimeAgo(timestamp) {
+    const now = Date.now();
+    const diff = now - timestamp;
+
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  }
+
+  // Update badge count
+  function updateNotificationBadge() {
+    const userEmail = getUserEmailFromCookie();
+    if (!userEmail) return;
+
+    const unreadCount = notifications.filter(n => !n.read && n.email === userEmail).length;
+    const badge = document.getElementById('notificationBadge');
+
+    if (badge) {
+      if (unreadCount > 0) {
+        badge.style.display = 'flex';
+        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  }
+
+  // Save notifications to JSON (если нужно сохранять изменения обратно)
+  async function saveNotificationsToJSON() {
+    try {
+      // Здесь может быть логика для сохранения изменений обратно в JSON
+      // Например, через API endpoint или localStorage
+      localStorage.setItem('notifications', JSON.stringify(notifications));
+    } catch (error) {
+      console.error('Error saving notifications:', error);
+    }
+  }
+
+  // Function to add new notification
+  function addNewNotification(title, message) {
+    const userEmail = getUserEmailFromCookie();
+    if (!userEmail) return;
+
+    const newNotification = {
+      id: Date.now(),
+      title: title,
+      message: message,
+      timestamp: Date.now(),
+      read: false,
+      type: 'info',
+      email: userEmail
+    };
+
+    notifications.unshift(newNotification);
+    populateNotificationsList();
+    updateNotificationBadge();
+    saveNotificationsToJSON();
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeNotificationsSection();
+  })
+  // Example usage:
+  // addNewNotification('New Message', 'You have received a new message from support');
+</script>
